@@ -80,6 +80,32 @@ app.post('/add', function(req, res){
 	  console.error('idle client error', err.message, err.stack)
 	})
 });
+
+app.delete('/delete/:id', function(req, res){
+	var pool = new pg.Pool(config);
+	// to run a query we can acquire a client from the pool,
+	// run a query on the client, and then return the client to the pool
+	pool.connect(function(err, client, done) {
+	  if(err) {
+	    return console.error('error fetching client from pool', err);
+	  }
+	  client.query("DELETE FROM recipes WHERE id = $1",
+	  	[req.params.id]);
+
+	  done();
+	  res.send(200);
+	});
+
+	pool.on('error', function (err, client) {
+	  // if an error is encountered by a client while it sits idle in the pool
+	  // the pool itself will emit an error event with both the error and
+	  // the client which emitted the original error
+	  // this is a rare occurrence but can happen if there is a network partition
+	  // between your application and the database, the database restarts, etc.
+	  // and so you might want to handle it and at least log it out
+	  console.error('idle client error', err.message, err.stack)
+	})
+});
 app.listen(3000, function(){
 	console.log('Server started on port 3000');
 });
