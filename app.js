@@ -55,7 +55,7 @@ app.get('/', function(req,res){
 	})
 });
 
-/*app.post('/add', function(req, res){
+app.post('/add', function(req, res){
 	var pool = new pg.Pool(config);
 	// to run a query we can acquire a client from the pool,
 	// run a query on the client, and then return the client to the pool
@@ -63,15 +63,11 @@ app.get('/', function(req,res){
 	  if(err) {
 	    return console.error('error fetching client from pool', err);
 	  }
-	  client.query('INSERT INTO FROM recipes', function(err, result) {
+	  client.query("INSERT INTO recipes(name, ingredients, directions) VALUES($1, $2, $3)",
+	  	[req.body.name, req.body.ingredients, req.body.directions]);
 
-	    if(err) {
-	      return console.error('error running query', err);
-	    }
-	    res.render('index',{recipes:result.rows});
-	    done();
-
-	  });
+	  done();
+	  res.redirect('/');
 	});
 
 	pool.on('error', function (err, client) {
@@ -83,7 +79,7 @@ app.get('/', function(req,res){
 	  // and so you might want to handle it and at least log it out
 	  console.error('idle client error', err.message, err.stack)
 	})
-});*/
+});
 app.listen(3000, function(){
 	console.log('Server started on port 3000');
 });
